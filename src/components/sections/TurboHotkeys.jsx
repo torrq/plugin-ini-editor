@@ -6,8 +6,6 @@ const SUFFIX_OPTIONS = [
   { value: '<HOTKEY_ONLY>', label: 'Hotkey Only — no click, cyclic' },
 ]
 
-const SLOTS = ['BTN_ID1', 'BTN_ID2', 'BTN_ID3', 'BTN_ID4']
-
 // Map browser KeyboardEvent.code → plugin.ini key name
 const CODE_TO_INI = {
   KeyA:'A', KeyB:'B', KeyC:'C', KeyD:'D', KeyE:'E', KeyF:'F', KeyG:'G',
@@ -56,23 +54,16 @@ function KeyCapture({ value, onChange }) {
 
   useEffect(() => {
     if (!listening) return
-
     const onKey = (e) => {
       e.preventDefault()
       e.stopPropagation()
-      // ESC cancels without binding
       if (e.code === 'Escape') { setListening(false); return }
       const ini = CODE_TO_INI[e.code]
-      if (ini) {
-        onChange(ini)
-        setListening(false)
-      }
+      if (ini) { onChange(ini); setListening(false) }
     }
-
     const onClickOutside = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setListening(false)
     }
-
     window.addEventListener('keydown', onKey, true)
     window.addEventListener('mousedown', onClickOutside)
     return () => {
@@ -98,9 +89,7 @@ function KeyCapture({ value, onChange }) {
         {listening
           ? '⌨  Press a key…'
           : value
-            ? <kbd className="px-2 py-0.5 bg-base border border-border-bright rounded text-accent text-xs font-mono">
-                {value}
-              </kbd>
+            ? <kbd className="px-2 py-0.5 bg-base border border-border-bright rounded text-accent text-xs font-mono">{value}</kbd>
             : <span className="text-subtle text-xs">Click to bind</span>
         }
       </button>
@@ -113,68 +102,104 @@ function KeyCapture({ value, onChange }) {
   )
 }
 
-export default function TurboHotkeys({ get, set }) {
+export default function TurboHotkeys({ pairs, set, add, remove }) {
+  // Derive slots from pairs, sorted by BTN_ID number
+  const slots = pairs
+    .filter(p => /^BTN_ID\d+$/i.test(p.key))
+    .sort((a, b) => {
+      const na = parseInt(a.key.replace(/\D/g, ''))
+      const nb = parseInt(b.key.replace(/\D/g, ''))
+      return na - nb
+    })
+
+  const nextSlotId = () => {
+    if (slots.length === 0) return 'BTN_ID1'
+    const max = Math.max(...slots.map(s => parseInt(s.key.replace(/\D/g, ''))))
+    return `BTN_ID${max + 1}`
+  }
+
   return (
     <div>
       <div className="section-card">
-        <h2 className="section-title">Turbo Hotkeys</h2>
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="section-title">Turbo Hotkeys</h2>
+          <button
+            onClick={() => add(nextSlotId(), '')}
+            className="px-3 py-1.5 bg-accent/10 border border-accent rounded
+                       text-accent font-display font-semibold text-sm
+                       hover:bg-accent/20 transition-colors"
+          >
+            + Add Slot
+          </button>
+        </div>
         <p className="section-subtitle">
-          Click a key slot to bind it, then press the key you want.
+          Click a key slot to bind it — just press the key you want.
           Enable Turbo Mode in-game with{' '}
           <span className="font-mono text-accent">/turbo</span>.
           Restart your client after saving changes.
         </p>
 
+        {slots.length === 0 && (
+          <div className="text-center text-muted py-8 font-mono text-sm border border-dashed border-border rounded-lg">
+            No hotkey slots. Click "+ Add Slot" to create one.
+          </div>
+        )}
+
         <div className="space-y-3 mt-2">
-          {SLOTS.map((slot, i) => {
-            const raw = get(slot)
+          {slots.map(({ key: slotKey, value: raw }, i) => {
             const { key, suffix } = parseSlotValue(raw)
 
+            const note = !key ? null
+              : suffix === '' ? 'Hold key, then left-click to place skill'
+              : suffix === '<CLICK_ONLY>' ? 'Quick LMB only — the hotkey itself is blocked'
+              : suffix === '<HOTKEY_ONLY>' ? 'Hotkey alone places skill — cycles through targets'
+              : null
+
             return (
-              <div key={slot} className="flex items-center gap-4 p-4 bg-panel rounded-lg border border-border">
-                <div className="w-14 flex-shrink-0">
-                  <div className="text-text font-display font-bold">Slot {i + 1}</div>
-                  <div className="text-subtle text-xs font-mono">{slot}</div>
-                </div>
+              <div key={slotKey} className="p-4 bg-panel rounded-lg border border-border">
+                {/* Top row: label + key + mode + remove */}
+                <div className="flex items-center gap-4">
+                  <div className="w-14 flex-shrink-0">
+                    <div className="text-text font-display font-bold">Slot {i + 1}</div>
+                  </div>
 
-                <div className="w-40 flex-shrink-0">
-                  <div className="field-label text-xs mb-1.5">Key</div>
-                  <KeyCapture
-                    value={key}
-                    onChange={newKey => set(slot, buildSlotValue(newKey, suffix))}
-                  />
-                </div>
+                  <div className="w-40 flex-shrink-0">
+                    <div className="field-label text-xs mb-1.5">Key</div>
+                    <KeyCapture
+                      value={key}
+                      onChange={newKey => set(slotKey, buildSlotValue(newKey, suffix))}
+                    />
+                  </div>
 
-                <div className="flex-1">
-                  <div className="field-label text-xs mb-1.5">Mode</div>
-                  <select
-                    value={suffix}
-                    onChange={e => set(slot, buildSlotValue(key, e.target.value))}
-                    className="field-input"
-                    disabled={!key}
-                  >
-                    {SUFFIX_OPTIONS.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </div>
+                  <div className="flex-1">
+                    <div className="field-label text-xs mb-1.5">Mode</div>
+                    <select
+                      value={suffix}
+                      onChange={e => set(slotKey, buildSlotValue(key, e.target.value))}
+                      className="field-input"
+                      disabled={!key}
+                    >
+                      {SUFFIX_OPTIONS.map(o => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div className="w-52 flex-shrink-0 text-muted text-xs font-mono leading-relaxed">
-                  {!key && <span className="text-subtle">—</span>}
-                  {key && suffix === '' && 'Hold key, then left-click to place skill'}
-                  {key && suffix === '<CLICK_ONLY>' && 'Quick LMB only — the hotkey itself is blocked'}
-                  {key && suffix === '<HOTKEY_ONLY>' && 'Hotkey alone places skill — cycles through targets'}
-                </div>
-
-                {raw && (
                   <button
-                    onClick={() => set(slot, '')}
+                    onClick={() => remove(slotKey)}
                     className="flex-shrink-0 w-6 h-6 flex items-center justify-center
-                               text-subtle hover:text-red transition-colors text-xl leading-none"
-                    title="Clear"
+                               text-subtle hover:text-red transition-colors text-xl leading-none mt-4"
+                    title="Remove slot"
                   >
                     ×
                   </button>
+                </div>
+
+                {/* Note below */}
+                {note && (
+                  <div className="mt-2 ml-18 text-muted text-xs font-mono" style={{ marginLeft: '4.5rem' }}>
+                    {note}
+                  </div>
                 )}
               </div>
             )

@@ -1,13 +1,15 @@
+import { Settings, Monitor, Type, Keyboard, SlidersHorizontal, Grid3x3, Image, Timer, Palette } from 'lucide-react'
+
 const SECTIONS = [
-  { id: 'Command Status', label: 'Command Status', icon: '⚙' },
-  { id: 'Client',         label: 'Client',         icon: '🖥' },
-  { id: 'Fonts',          label: 'Fonts',          icon: 'T' },
-  { id: 'Turbo Hotkeys',  label: 'Turbo Hotkeys',  icon: '⌨' },
-  { id: 'Global Configs', label: 'Global Configs', icon: '◈' },
-  { id: 'Cell Color',     label: 'Cell Colors',    icon: '▣' },
-  { id: 'Images',         label: 'Images',         icon: '🖼' },
-  { id: 'AOE Time',       label: 'AOE Timings',    icon: '⏱' },
-  { id: 'AOE Color',      label: 'AOE Colors',     icon: '🎨' },
+  { id: 'Command Status', label: 'Command Status', Icon: Settings },
+  { id: 'Client',         label: 'Client',         Icon: Monitor },
+  { id: 'Fonts',          label: 'Fonts',          Icon: Type },
+  { id: 'Turbo Hotkeys',  label: 'Turbo Hotkeys',  Icon: Keyboard },
+  { id: 'Global Configs', label: 'Global Configs', Icon: SlidersHorizontal },
+  { id: 'Cell Color',     label: 'Cell Colors',    Icon: Grid3x3 },
+  { id: 'Images',         label: 'Images',         Icon: Image },
+  { id: 'AOE Time',       label: 'AOE Timings',    Icon: Timer },
+  { id: 'AOE Color',      label: 'AOE Colors',     Icon: Palette },
 ]
 
 export default function Sidebar({ active, onSelect, hasFile }) {
@@ -15,15 +17,16 @@ export default function Sidebar({ active, onSelect, hasFile }) {
     <aside className="w-52 flex-shrink-0 flex flex-col border-r border-border bg-surface">
       {/* Logo / title */}
       <div className="px-4 pt-5 pb-4 border-b border-border">
-        <div className="text-accent font-display font-bold text-lg tracking-widest uppercase">
-          OSRO Revo
+        <div className="font-display font-bold text-xl tracking-widest uppercase">
+          <span className="text-silver">OS</span><span className="text-accent">RO</span>
+          <span className="text-header-dim font-medium text-sm ml-2 tracking-wider normal-case">Revo</span>
         </div>
         <div className="text-muted text-xs font-mono mt-0.5">plugin.ini editor</div>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-2">
-        {SECTIONS.map(({ id, label, icon }) => {
+        {SECTIONS.map(({ id, label, Icon }) => {
           const isActive = active === id
           const disabled = !hasFile
           return (
@@ -43,9 +46,7 @@ export default function Sidebar({ active, onSelect, hasFile }) {
                 }
               `}
             >
-              <span className="text-base w-5 text-center flex-shrink-0 font-mono">
-                {icon}
-              </span>
+              <Icon size={15} className={`flex-shrink-0 ${isActive ? 'text-accent' : disabled ? 'text-subtle' : 'text-text'}`} />
               {label}
             </button>
           )
@@ -54,7 +55,7 @@ export default function Sidebar({ active, onSelect, hasFile }) {
 
       {/* Version tag */}
       <div className="px-4 py-3 border-t border-border">
-        <span className="text-subtle text-xs font-mono">v0.1.0</span>
+        <span className="text-subtle text-xs font-mono">v0.1.1</span>
       </div>
     </aside>
   )

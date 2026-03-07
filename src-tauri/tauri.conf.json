@@ -7,19 +7,23 @@
   },
   "package": {
     "productName": "OSRO Revo plugin.ini Editor",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "tauri": {
     "allowlist": {
       "dialog": {
         "open": true,
         "save": true
+      },
+      "window": {
+        "close": true,
+        "all": false
       }
     },
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.osguard.pluginini",
+      "identifier": "com.osro.pluginini",
       "icon": ["icons/icon.ico"]
     },
     "security": {
@@ -30,10 +34,11 @@
         "fullscreen": false,
         "resizable": true,
         "title": "OSRO Revo plugin.ini Editor",
-        "width": 1280,
-        "height": 860,
+        "width": 900,
+        "height": 900,
         "minWidth": 900,
-        "minHeight": 600
+        "minHeight": 600,
+        "closable": true
       }
     ]
   }

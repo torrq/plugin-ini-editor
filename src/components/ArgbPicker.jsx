@@ -15,7 +15,7 @@ function buildArgb(alpha, rgbHex) {
   return `0x${a}${rgb}`
 }
 
-export default function ArgbPicker({ value, onChange }) {
+export default function ArgbPicker({ value, onChange, hideHex = false }) {
   const [editing, setEditing] = useState(false)
   const [rawInput, setRawInput] = useState('')
 
@@ -52,7 +52,7 @@ export default function ArgbPicker({ value, onChange }) {
   const displayHex = editing ? rawInput : (value || '0xFF888888').toUpperCase()
 
   return (
-    <div className="flex items-center gap-3 flex-wrap">
+    <div className="flex items-center gap-3 w-full">
       {/* Swatch + color picker */}
       <div className="relative flex-shrink-0" style={{ width: 32, height: 32 }}>
         {/* Checkerboard background to show transparency */}
@@ -77,32 +77,34 @@ export default function ArgbPicker({ value, onChange }) {
       </div>
 
       {/* Alpha slider */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <span className="text-muted text-xs font-display uppercase tracking-wider w-8">A</span>
+      <div className="flex items-center gap-2 flex-1">
+        <span className="text-muted text-xs font-display uppercase tracking-wider w-8 flex-shrink-0">A</span>
         <input
           type="range"
           min="0"
           max="255"
           value={alpha}
           onChange={handleAlphaSlider}
-          className="w-20"
+          className="flex-1"
           title={`Alpha: ${alphaPercent}%`}
         />
-        <span className="text-muted text-xs font-mono w-8 text-right">{alphaPercent}%</span>
+        <span className="text-muted text-xs font-mono w-8 text-right flex-shrink-0">{alphaPercent}%</span>
       </div>
 
       {/* Hex input */}
-      <input
-        type="text"
-        value={displayHex}
-        onChange={handleHexInput}
-        onFocus={() => { setEditing(true); setRawInput(displayHex) }}
-        onBlur={handleHexBlur}
-        className="font-mono text-xs bg-panel border border-border rounded px-2 py-1 w-28 text-text focus:outline-none focus:border-accent transition-colors"
-        spellCheck={false}
-        maxLength={10}
-        title="Edit hex value directly (0xAARRGGBB)"
-      />
+      {!hideHex && (
+        <input
+          type="text"
+          value={displayHex}
+          onChange={handleHexInput}
+          onFocus={() => { setEditing(true); setRawInput(displayHex) }}
+          onBlur={handleHexBlur}
+          className="font-mono text-xs bg-panel border border-border rounded px-2 py-1 w-28 flex-shrink-0 text-text focus:outline-none focus:border-accent transition-colors"
+          spellCheck={false}
+          maxLength={10}
+          title="Edit hex value directly (0xAARRGGBB)"
+        />
+      )}
     </div>
   )
 }

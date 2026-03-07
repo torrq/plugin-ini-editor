@@ -12,21 +12,19 @@ export default function CellColors({ get, set }) {
       <h2 className="section-title">Cell Colors</h2>
       <p className="section-subtitle">
         Colors for range indicators and dead cell overlays.
-        Format is <span className="font-mono text-accent">0xAARRGGBB</span> — click the swatch to pick a color,
-        use the slider to adjust transparency.
+        Click the swatch to pick a color, use the slider to adjust transparency.
       </p>
 
       <div className="space-y-1">
         {CELLS.map(({ key, label, desc }) => (
           <div key={key} className="py-4 border-b border-border last:border-0">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-shrink-0 w-40">
+            <div className="flex items-center gap-6">
+              <div className="flex-shrink-0 w-48">
                 <div className="text-text font-display font-semibold">{label}</div>
                 <div className="text-muted text-xs font-mono mt-0.5">{desc}</div>
-                <div className="badge mt-1">{key}</div>
               </div>
               <div className="flex-1">
-                <ArgbPicker value={get(key)} onChange={v => set(key, v)} />
+                <ArgbPicker value={get(key)} onChange={v => set(key, v)} hideHex />
               </div>
             </div>
           </div>

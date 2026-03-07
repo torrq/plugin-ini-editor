@@ -8,9 +8,9 @@
   }
   
   body {
-    background: #0b0d14;
-    color: #dde1f0;
-    font-family: 'Rajdhani', sans-serif;
+    background: #121415;
+    color: #e2edfc;
+    font-family: 'Montserrat', Arial, Helvetica, sans-serif;
     overflow: hidden;
     user-select: none;
   }
@@ -68,7 +68,7 @@
   }
 
   .field-label {
-    @apply text-muted text-sm font-display font-semibold uppercase tracking-wider;
+    @apply text-muted text-xs font-display font-semibold uppercase tracking-wide;
   }
 
   .section-card {

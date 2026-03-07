@@ -40,10 +40,7 @@ export default function ClientSection({ get, set }) {
             `}
           >
             <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <div className="text-text font-display font-semibold">{label}</div>
-                <span className="badge font-mono text-xs">{key}</span>
-              </div>
+              <div className="text-text font-display font-semibold">{label}</div>
               <div className="text-muted text-sm mt-1">{desc}</div>
               {warning && (
                 <div className="text-amber text-xs font-mono mt-2 flex items-start gap-1.5">
