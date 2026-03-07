@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    background: #0b0d14;
+    color: #dde1f0;
+    font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b0d14;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #343a52;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4a5272;
+  }
+
+  input[type="color"] {
+    -webkit-appearance: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: #343a52;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #22d3ee;
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .field-input {
+    @apply bg-panel border border-border rounded px-3 py-1.5 text-text font-mono text-sm
+           focus:outline-none focus:border-accent transition-colors w-full;
+  }
+
+  .field-label {
+    @apply text-muted text-sm font-display font-semibold uppercase tracking-wider;
+  }
+
+  .section-card {
+    @apply bg-surface border border-border rounded-lg p-5 mb-4;
+  }
+
+  .section-title {
+    @apply text-text font-display font-bold text-xl tracking-wide mb-1;
+  }
+
+  .section-subtitle {
+    @apply text-muted text-sm font-display mb-5;
+  }
+
+  .divider {
+    @apply border-t border-border my-4;
+  }
+
+  .badge {
+    @apply font-mono text-xs px-1.5 py-0.5 rounded bg-panel border border-border text-muted;
+  }
+}
