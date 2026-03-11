@@ -1,3 +1,4 @@
+import logo from '../assets/logo.png'
 import { Settings, Monitor, Type, Keyboard, SlidersHorizontal, Grid3x3, Image, Timer, Palette } from 'lucide-react'
 
 const SECTIONS = [
@@ -15,13 +16,9 @@ const SECTIONS = [
 export default function Sidebar({ active, onSelect, hasFile }) {
   return (
     <aside className="w-52 flex-shrink-0 flex flex-col border-r border-border bg-surface">
-      {/* Logo / title */}
-      <div className="px-4 pt-5 pb-4 border-b border-border">
-        <div className="font-display font-bold text-xl tracking-widest uppercase">
-          <span className="text-silver">OS</span><span className="text-accent">RO</span>
-          <span className="text-header-dim font-medium text-sm ml-2 tracking-wider normal-case">Revo</span>
-        </div>
-        <div className="text-muted text-xs font-mono mt-0.5">plugin.ini editor</div>
+      {/* Logo */}
+      <div className="px-4 pt-4 pb-3 border-b border-border">
+        <img src={logo} alt="OSRO Plugin" className="w-full" draggable={false} />
       </div>
 
       {/* Nav */}

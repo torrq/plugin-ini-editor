@@ -1,6 +1,6 @@
-# OSRO Revo plugin.ini Editor
+# OSRO Plugin
 
-A desktop app for editing OSRO Revo's plugin.ini
+A desktop app for editing the OSRO Revo plugin.ini file.
 
 Built with Tauri (Rust backend) + React + Tailwind CSS.
 

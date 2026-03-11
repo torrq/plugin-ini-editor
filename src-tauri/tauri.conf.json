@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "OSRO Revo plugin.ini Editor",
+    "productName": "OSRO Plugin",
     "version": "0.1.1"
   },
   "tauri": {
@@ -33,7 +33,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "OSRO Revo plugin.ini Editor",
+        "title": "OSRO Plugin",
         "width": 900,
         "height": 900,
         "minWidth": 900,
