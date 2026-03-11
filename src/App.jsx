@@ -126,6 +126,39 @@ export default function App() {
     }
   }
 
+  // Maps sidebar section IDs to the ini section name(s) they control
+  const SECTION_INI_NAMES = {
+    'Command Status': ['Command Status'],
+    'Client':         ['Client'],
+    'Fonts':          ['UI Font', 'Screen Render Font'],
+    'Turbo Hotkeys':  ['Turbo Hotkeys'],
+    'Global Configs': ['Global Configs'],
+    'Cell Color':     ['Cell Color'],
+    'Images':         ['Images'],
+    'AOE Time':       ['AOE Time'],
+    'AOE Color':      ['AOE Color'],
+  }
+
+  const handleResetSection = async () => {
+    const iniNames = SECTION_INI_NAMES[activeSection]
+    if (!iniNames) return
+    try {
+      const defaults = await invoke('get_defaults')
+      setConfig(prev => ({
+        ...prev,
+        sections: prev.sections.map(s =>
+          iniNames.includes(s.name)
+            ? (defaults.sections.find(d => d.name === s.name) ?? s)
+            : s
+        ),
+      }))
+      setDirty(true)
+      flash('Section reset — save to apply', 'text-amber')
+    } catch (e) {
+      flash(`Reset failed: ${e}`, 'text-red')
+    }
+  }
+
   const doQuit = async () => {
     setDirty(false)
     await appWindow.close()
@@ -316,6 +349,16 @@ export default function App() {
 
         {/* Section content */}
         <main className="flex-1 overflow-y-auto p-6">
+          <div className="flex justify-end mb-3">
+            <button
+              onClick={handleResetSection}
+              className="px-3 py-1 bg-panel border border-border rounded text-subtle text-xs
+                         font-display font-semibold hover:border-amber/60 hover:text-amber/80 transition-colors"
+              title={`Reset this section to defaults`}
+            >
+              ↺ Reset section
+            </button>
+          </div>
           {renderSection()}
         </main>
       </div>
