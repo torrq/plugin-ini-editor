@@ -82,51 +82,46 @@ fn parse_ini(content: &str) -> IniConfig {
 fn render_ini(config: &IniConfig) -> String {
     let mut out = String::new();
     for section in &config.sections {
-        out.push_str(&format!("{}\n", section.header));
+        out.push_str(&format!("{}\r\n", section.header));
 
         let mut emitted_keys: std::collections::HashSet<String> = std::collections::HashSet::new();
 
         for raw in &section.raw_lines {
             let trimmed = raw.trim();
-            if trimmed.is_empty() || trimmed.starts_with(';') {
-                // Comment or blank — emit verbatim
-                out.push_str(&format!("{}\n", raw));
+            if trimmed.is_empty() {
+                // Suppress blanks once keys have started — prevents stray gaps from
+                // old saves or defaults that had blanks mid-section (e.g. after BTN_ID4)
+                if emitted_keys.is_empty() {
+                    out.push_str("\r\n");
+                }
+            } else if trimmed.starts_with(';') {
+                // Comment — emit verbatim (trim to drop original CR if present)
+                out.push_str(&format!("{}\r\n", trimmed));
             } else if let Some(eq) = trimmed.find('=') {
                 // Key=value line — emit with updated value, preserving any inline comment
                 let key = trimmed[..eq].trim();
                 let rest = trimmed[eq + 1..].trim();
-                // Extract the inline comment if present (e.g. "; Default: Arial")
                 let inline_comment = match rest.find(';') {
                     Some(i) => Some(rest[i..].trim().to_string()),
                     None => None,
                 };
                 if let Some(pair) = section.pairs.iter().find(|p| p.key == key) {
                     match inline_comment {
-                        Some(comment) => out.push_str(&format!("{} = {} {}\n", pair.key, pair.value, comment)),
-                        None          => out.push_str(&format!("{} = {}\n", pair.key, pair.value)),
+                        Some(comment) => out.push_str(&format!("{} = {} {}\r\n", pair.key, pair.value, comment)),
+                        None          => out.push_str(&format!("{} = {}\r\n", pair.key, pair.value)),
                     }
                     emitted_keys.insert(key.to_string());
                 }
             }
         }
 
-        // Append any new keys added by the user (e.g. extra turbo slots)
-        let mut appended_new = false;
-        for pair in &section.pairs {
-            if !emitted_keys.contains(&pair.key) {
-                out.push_str(&format!("{} = {}\n", pair.key, pair.value));
-                appended_new = true;
-            }
+        // Append any new keys not present in raw_lines
+        for pair in section.pairs.iter().filter(|p| !emitted_keys.contains(&p.key)) {
+            out.push_str(&format!("{} = {}\r\n", pair.key, pair.value));
         }
 
-        // Add a trailing blank line between sections.
-        // If we appended new keys, the last thing written was a key line — always add \n.
-        // Otherwise defer to whether raw_lines already ended with a blank.
-        let already_blank = !appended_new &&
-            section.raw_lines.last().map(|l| l.trim().is_empty()).unwrap_or(false);
-        if !already_blank {
-            out.push('\n');
-        }
+        // One blank line between sections
+        out.push_str("\r\n");
     }
     out
 }
