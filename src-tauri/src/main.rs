@@ -111,14 +111,19 @@ fn render_ini(config: &IniConfig) -> String {
         }
 
         // Append any new keys added by the user (e.g. extra turbo slots)
+        let mut appended_new = false;
         for pair in &section.pairs {
             if !emitted_keys.contains(&pair.key) {
                 out.push_str(&format!("{} = {}\n", pair.key, pair.value));
+                appended_new = true;
             }
         }
 
-        // Only add trailing newline if the section didn't already end with a blank line
-        let already_blank = section.raw_lines.last().map(|l| l.trim().is_empty()).unwrap_or(false);
+        // Add a trailing blank line between sections.
+        // If we appended new keys, the last thing written was a key line — always add \n.
+        // Otherwise defer to whether raw_lines already ended with a blank.
+        let already_blank = !appended_new &&
+            section.raw_lines.last().map(|l| l.trim().is_empty()).unwrap_or(false);
         if !already_blank {
             out.push('\n');
         }
